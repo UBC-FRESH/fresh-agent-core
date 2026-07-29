@@ -144,6 +144,32 @@ class Capability(ABC, Generic[T]):
     description: str = ''
     max_attempts: int = DEFAULT_MAX_ATTEMPTS
 
+    #: JSON Schema for this capability's inputs, used to advertise the tool over
+    #: MCP. The default accepts any object; override it so a calling agent can see
+    #: what the capability actually expects rather than guessing.
+    input_schema: dict[str, Any] = {'type': 'object'}
+
+    def from_payload(self, payload: dict[str, Any]) -> Any:
+        """
+        Convert a JSON tool-call payload into this capability's input type.
+
+        Defaults to passing the dict through. Override when the capability takes a
+        structured input, so that the MCP boundary is the only place that has to
+        know about JSON.
+
+        :param payload: Decoded arguments from a tool call.
+        """
+        return payload
+
+    def render(self, value: T) -> str:
+        """
+        Render a validated result as text for a tool response.
+
+        Defaults to ``str``. Override to produce something an agent can act on
+        directly rather than having to parse a repr.
+        """
+        return str(value)
+
     def __init__(self) -> None:
         """
         Reject concrete capabilities that omit identity.
