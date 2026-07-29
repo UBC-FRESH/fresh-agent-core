@@ -103,11 +103,11 @@ def build_server(
 
     server = Server(server_name)
 
-    @server.list_tools()  # type: ignore[no-untyped-call, untyped-decorator]
+    @server.list_tools()
     async def list_tools() -> list[Any]:
         return [Tool(**descriptor) for descriptor in describe_tools(registry)]
 
-    @server.call_tool()  # type: ignore[untyped-decorator]
+    @server.call_tool()
     async def call_tool(name: str, arguments: dict[str, Any]) -> list[Any]:
         capability = registry.get(name)
         context = context_factory(name, arguments) if context_factory else None
