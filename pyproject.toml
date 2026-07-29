@@ -15,7 +15,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-mcp = ["mcp>=1.0"]
+# Pinned below 2.0. The host is written against the 1.x low-level Server API
+# (@server.list_tools() / @server.call_tool()), which 2.0 removed. An unbounded
+# '>=1.0' let CI resolve 2.0 and fail with
+# "'Server' object has no attribute 'list_tools'" -- a real incompatibility, not
+# an environment quirk. Migrating to the 2.x API is tracked separately.
+mcp = ["mcp>=1.0,<2"]
 dev = [
   "pytest",
   "pytest-cov",
@@ -46,17 +51,18 @@ ignore_missing_imports = true
 strict = true
 check_untyped_defs = true
 
-# The MCP SDK's Server and decorator typings differ between releases, so pinning
-# exact `type: ignore` codes here passes locally and fails on whichever version CI
-# resolves -- an environment difference, not a defect. This module is a thin
-# adapter with almost no logic of its own: describe_tools() and format_result()
-# hold the behaviour worth checking, they are plain functions over plain data, and
-# they remain strictly checked along with the rest of the package.
+# Only the decorator typing is relaxed, and only for the MCP adapter. The SDK's
+# decorators are untyped, which is a property of the library rather than a defect
+# here.
+#
+# Note what is deliberately NOT disabled: attr-defined. An earlier version of this
+# config suppressed it as environment noise, and it was in fact reporting a real
+# incompatibility -- the 2.0 SDK genuinely lacks the attributes this module uses.
+# Suppressing it hid a true failure that the runtime tests then had to catch.
 [[tool.mypy.overrides]]
 module = "fresh_agent_core.mcp.server"
 disallow_untyped_decorators = false
-warn_unused_ignores = false
-disable_error_code = ["attr-defined", "no-untyped-call", "misc"]
+disable_error_code = ["no-untyped-call"]
 
 [tool.ruff]
 line-length = 100
