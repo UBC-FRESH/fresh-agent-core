@@ -17,11 +17,19 @@ from __future__ import annotations
 
 import json
 import os
-import tomllib
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
 from urllib.parse import urlsplit
+
+# tomllib landed in 3.11. ws3 supports 3.10, so its optional extras must too --
+# raising this package's floor would make the agent extra unusable for part of
+# ws3's supported range.
+if sys.version_info >= (3, 11):
+    import tomllib
+else:  # pragma: no cover - exercised only on 3.10
+    import tomli as tomllib
 
 ENV_ENDPOINT = 'FRESH_AGENT_ENDPOINT'
 ENV_MODEL = 'FRESH_AGENT_MODEL'
