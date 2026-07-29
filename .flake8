@@ -1,0 +1,11 @@
+# flake8 configuration for fresh-agent-core
+#
+# This is a new package with no legacy, so it is held to a strict standard from
+# the start. Deliberately does NOT inherit the style exemptions ws3 carries for
+# conventions that predate its linter.
+#
+# If this file starts growing exemptions, that is a signal worth heeding.
+
+[flake8]
+max-line-length = 100
+exclude = __pycache__,.git,build,dist,.venv

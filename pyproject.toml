@@ -1,0 +1,50 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fresh-agent-core"
+authors = [{name = "Gregory Paradis", email = "gregory.paradis@ubc.ca"}]
+dynamic = ["version", "description"]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = [
+  "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+mcp = ["mcp>=1.0"]
+dev = [
+  "pytest",
+  "pytest-cov",
+  "coverage",
+  "flake8",
+  "mypy",
+  "ruff",
+]
+
+[tool.hatch.version]
+# Deliberately not source = "code": that imports the module to read __version__,
+# which fails during metadata generation because __init__.py re-exports from
+# submodules that are not importable until the package is installed. The default
+# reader scans for __version__ without executing the file.
+path = "fresh_agent_core/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["fresh_agent_core"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+strict = true
+check_untyped_defs = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
