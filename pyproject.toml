@@ -29,6 +29,10 @@ dev = [
   "mypy",
   "ruff",
 ]
+release = [
+  "build",
+  "twine",
+]
 
 [tool.hatch.version]
 # Deliberately not source = "code": that imports the module to read __version__,

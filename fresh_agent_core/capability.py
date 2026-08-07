@@ -28,7 +28,7 @@ from __future__ import annotations
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Generic, Optional, TypeVar
+from typing import Any, ClassVar, Generic, TypeVar
 
 from fresh_agent_core.config import AgentConfig
 from fresh_agent_core.errors import ValidationExhausted
@@ -71,12 +71,12 @@ class Verdict:
     errors: tuple[str, ...] = ()
 
     @classmethod
-    def valid(cls) -> 'Verdict':
+    def valid(cls) -> Verdict:
         """A passing verdict."""
         return cls(True)
 
     @classmethod
-    def invalid(cls, *errors: str) -> 'Verdict':
+    def invalid(cls, *errors: str) -> Verdict:
         """
         A failing verdict.
 
@@ -108,7 +108,7 @@ class CapabilityResult(Generic[T]):
     """
 
     ok: bool
-    value: Optional[T]
+    value: T | None
     attempts: int
     provenance_ids: tuple[str, ...]
     errors: tuple[str, ...]
@@ -147,7 +147,7 @@ class Capability(ABC, Generic[T]):
     #: JSON Schema for this capability's inputs, used to advertise the tool over
     #: MCP. The default accepts any object; override it so a calling agent can see
     #: what the capability actually expects rather than guessing.
-    input_schema: dict[str, Any] = {'type': 'object'}
+    input_schema: ClassVar[dict[str, Any]] = {'type': 'object'}
 
     def from_payload(self, payload: dict[str, Any]) -> Any:
         """
@@ -160,6 +160,24 @@ class Capability(ABC, Generic[T]):
         :param payload: Decoded arguments from a tool call.
         """
         return payload
+
+    def coerce_input(self, inputs: Any) -> Any:
+        """
+        Normalise caller-supplied input into this capability's input type.
+
+        Applied at the top of :py:meth:`run`, so every entry point benefits --
+        direct Python calls, MCP tool calls, and tests alike.
+
+        Defaults to passing through. Override to accept convenient shorthand
+        alongside the structured type: a bare string where the capability takes a
+        single description, or a dict matching the JSON schema.
+
+        Exists because a documented convenience form that the code does not
+        actually accept is a documentation defect waiting to happen. Coercion is
+        declared here, next to the type it produces, rather than left to each
+        caller to remember.
+        """
+        return inputs
 
     def render(self, value: T) -> str:
         """
@@ -231,7 +249,7 @@ class Capability(ABC, Generic[T]):
         provider: Provider,
         config: AgentConfig,
         context: Any = None,
-        sink: Optional[ProvenanceSink] = None,
+        sink: ProvenanceSink | None = None,
     ) -> CapabilityResult[T]:
         """
         Execute the validate/retry loop.
@@ -254,6 +272,7 @@ class Capability(ABC, Generic[T]):
         # on the very first call -- when it is empty by definition.
         if sink is None:
             sink = NullSink()
+        inputs = self.coerce_input(inputs)
         failures: list[str] = []
         provenance_ids: list[str] = []
 
@@ -267,7 +286,7 @@ class Capability(ABC, Generic[T]):
             # `parsed` is bound only on the success path, so it stays typed as T
             # and can be passed to validate() without a cast. `candidate` carries
             # the optional-ness, and is only ever non-None once validation passed.
-            candidate: Optional[T] = None
+            candidate: T | None = None
             verdict: Verdict
             try:
                 parsed = self.parse(raw)

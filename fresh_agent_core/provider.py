@@ -10,7 +10,7 @@ offline against :py:class:`~fresh_agent_core.testing.FakeProvider`.
 from __future__ import annotations
 
 import time
-from typing import Any, Optional, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 from fresh_agent_core.config import AgentConfig
 from fresh_agent_core.errors import ProviderError
@@ -78,7 +78,7 @@ class OpenAIProvider:
         """
         import httpx  # imported lazily so `import fresh_agent_core` stays cheap
 
-        last_error: Optional[str] = None
+        last_error: str | None = None
         attempts = self.transport_retries + 1
 
         for attempt in range(1, attempts + 1):
@@ -139,9 +139,15 @@ def _extract_content(body: Any, host: str) -> str:
         raise ProviderError(f"{host} returned a choice with no 'message' object.")
 
     content = message.get('content')
-    if not isinstance(content, str):
-        raise ProviderError(
-            f"{host} returned a message whose 'content' is "
-            f'{type(content).__name__}, expected a string.'
-        )
+    # Some models (MiniMax, Ornith with thinking) put responses in 'reasoning'
+    # instead of 'content'. Fall back gracefully.
+    if not isinstance(content, str) or content == '':
+        reasoning = message.get('reasoning')
+        if isinstance(reasoning, str) and reasoning:
+            content = reasoning
+        else:
+            raise ProviderError(
+                f"{host} returned a message whose 'content' is "
+                f'{type(content).__name__} (empty={content == ""!r}), expected a string.'
+            )
     return content

@@ -27,32 +27,28 @@ a ws3 mask valid.
 __version__ = '0.1.0a1'
 
 __all__ = [
-    # configuration
     'AgentConfig',
-    'available',
-    # errors
-    'FreshAgentError',
     'AgentUnavailable',
-    'ProviderError',
-    'ValidationExhausted',
-    'ParseError',
-    # providers
-    'Provider',
-    'OpenAIProvider',
-    'FakeProvider',
-    # capability contract
     'Capability',
     'CapabilityResult',
-    'Verdict',
-    'Registry',
-    # provenance
-    'ProvenanceRecord',
-    'ProvenanceSink',
+    'FakeProvider',
+    'FreshAgentError',
     'JSONLSink',
     'MemorySink',
     'NullSink',
+    'OpenAIProvider',
+    'ParseError',
+    'ProvenanceRecord',
+    'ProvenanceSink',
+    'Provider',
+    'ProviderError',
+    'Registry',
+    'ValidationExhausted',
+    'Verdict',
+    'available',
 ]
 
+from .capability import Capability, CapabilityResult, ParseError, Verdict
 from .config import AgentConfig, available
 from .errors import (
     AgentUnavailable,
@@ -60,7 +56,6 @@ from .errors import (
     ProviderError,
     ValidationExhausted,
 )
-from .capability import Capability, CapabilityResult, ParseError, Verdict
 from .provenance import JSONLSink, MemorySink, NullSink, ProvenanceRecord, ProvenanceSink
 from .provider import OpenAIProvider, Provider
 from .registry import Registry

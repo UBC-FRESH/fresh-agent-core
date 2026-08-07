@@ -8,7 +8,8 @@ is what lets the host stay generic and domain-free.
 
 from __future__ import annotations
 
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 from fresh_agent_core.capability import Capability
 

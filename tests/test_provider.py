@@ -154,9 +154,14 @@ class TestNoNetworkOnImport:
         import sys
 
         result = subprocess.run(
-            [sys.executable, '-c',
-             'import sys, fresh_agent_core; '
-             'print("httpx" in sys.modules)'],
+            [
+                sys.executable,
+                '-c',
+                (
+                    'import sys, fresh_agent_core; '
+                    'print("httpx" in sys.modules)'
+                ),
+            ],
             capture_output=True, text=True, check=True,
         )
         assert result.stdout.strip() == 'False'

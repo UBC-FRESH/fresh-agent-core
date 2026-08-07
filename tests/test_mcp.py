@@ -8,6 +8,7 @@ hold without an MCP runtime and without a network.
 from __future__ import annotations
 
 import json
+from typing import Any, ClassVar
 
 import pytest
 
@@ -19,7 +20,7 @@ from fresh_agent_core.registry import Registry
 class Alpha(Capability[str]):
     name = 'alpha'
     description = 'Does alpha things. Validated against a known set.'
-    input_schema = {
+    input_schema: ClassVar[dict[str, Any]] = {
         'type': 'object',
         'properties': {'query': {'type': 'string'}},
         'required': ['query'],

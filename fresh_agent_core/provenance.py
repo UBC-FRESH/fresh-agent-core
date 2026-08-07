@@ -24,7 +24,7 @@ import uuid
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Optional, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 ENV_LOG_PATH = 'FRESH_AGENT_LOG'
 DEFAULT_LOG_PATH = Path('.fresh-agent') / 'provenance.jsonl'
@@ -60,7 +60,7 @@ class ProvenanceRecord:
     duration_ms: float
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
     timestamp: str = field(default_factory=_utc_now)
-    prompt: Optional[list[dict[str, str]]] = None
+    prompt: list[dict[str, str]] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """JSON-serialisable form. Omits ``prompt`` unless it was captured."""
@@ -90,7 +90,7 @@ class JSONLSink:
         ``./.fresh-agent/provenance.jsonl``.
     """
 
-    def __init__(self, path: Optional[Path | str] = None) -> None:
+    def __init__(self, path: Path | str | None = None) -> None:
         if path is None:
             env_path = os.environ.get(ENV_LOG_PATH)
             path = Path(env_path) if env_path else DEFAULT_LOG_PATH

@@ -14,7 +14,8 @@ stays in the adopting package.
 from __future__ import annotations
 
 import json
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 from fresh_agent_core.capability import CapabilityResult
 from fresh_agent_core.config import AgentConfig
@@ -75,8 +76,8 @@ def build_server(
     server_name: str,
     provider: Provider,
     config: AgentConfig,
-    context_factory: Optional[ContextFactory] = None,
-    sink: Optional[ProvenanceSink] = None,
+    context_factory: ContextFactory | None = None,
+    sink: ProvenanceSink | None = None,
 ) -> Any:
     """
     Build an MCP server exposing *registry* as tools.

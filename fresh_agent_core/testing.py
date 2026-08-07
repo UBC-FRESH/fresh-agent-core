@@ -10,7 +10,7 @@ assertion without being able to script invalid output on demand.
 
 from __future__ import annotations
 
-from typing import Iterable, Optional
+from collections.abc import Iterable
 
 from fresh_agent_core.errors import ProviderError
 
@@ -74,6 +74,6 @@ class FakeProvider:
             raise item
         return item
 
-    def last_prompt(self) -> Optional[list[dict[str, str]]]:
+    def last_prompt(self) -> list[dict[str, str]] | None:
         """The most recent message list, or None if never called."""
         return self.calls[-1] if self.calls else None

@@ -20,7 +20,7 @@ import os
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urlsplit
 
 # tomllib landed in 3.11. ws3 supports 3.10, so its optional extras must too --
@@ -83,7 +83,7 @@ class AgentConfig:
 
     endpoint: str
     model: str
-    api_key: Optional[str] = None
+    api_key: str | None = None
     headers: dict[str, str] = field(default_factory=dict)
     timeout: float = DEFAULT_TIMEOUT
     temperature: float = 0.0
@@ -127,7 +127,7 @@ class AgentConfig:
     __str__ = __repr__
 
 
-def _from_env() -> Optional[AgentConfig]:
+def _from_env() -> AgentConfig | None:
     """Build a config from environment variables, or None if incomplete."""
     endpoint = os.environ.get(ENV_ENDPOINT)
     model = os.environ.get(ENV_MODEL)
@@ -165,7 +165,7 @@ def _from_env() -> Optional[AgentConfig]:
     )
 
 
-def _from_file(path: Path) -> Optional[AgentConfig]:
+def _from_file(path: Path) -> AgentConfig | None:
     """Build a config from a TOML file, or None if absent or incomplete."""
     if not path.is_file():
         return None
@@ -191,10 +191,10 @@ def _from_file(path: Path) -> Optional[AgentConfig]:
 
 
 def resolve(
-    config: Optional[AgentConfig] = None,
+    config: AgentConfig | None = None,
     *,
-    config_path: Optional[Path] = None,
-) -> Optional[AgentConfig]:
+    config_path: Path | None = None,
+) -> AgentConfig | None:
     """
     Resolve a configuration, or return ``None`` if none is available.
 
@@ -213,9 +213,9 @@ def resolve(
 
 
 def available(
-    config: Optional[AgentConfig] = None,
+    config: AgentConfig | None = None,
     *,
-    config_path: Optional[Path] = None,
+    config_path: Path | None = None,
 ) -> bool:
     """
     True when a configuration can be resolved.

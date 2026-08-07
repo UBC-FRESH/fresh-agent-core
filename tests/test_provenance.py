@@ -21,17 +21,17 @@ from fresh_agent_core.registry import Registry
 
 
 def _record(**overrides) -> ProvenanceRecord:
-    defaults = dict(
-        capability='demo',
-        model='test-model',
-        endpoint_host='example.test',
-        prompt_sha256='0' * 64,
-        raw_output='{"answer": "x"}',
-        ok=True,
-        verdict='ok',
-        attempt=1,
-        duration_ms=12.5,
-    )
+    defaults = {
+        'capability': 'demo',
+        'model': 'test-model',
+        'endpoint_host': 'example.test',
+        'prompt_sha256': '0' * 64,
+        'raw_output': '{"answer": "x"}',
+        'ok': True,
+        'verdict': 'ok',
+        'attempt': 1,
+        'duration_ms': 12.5,
+    }
     defaults.update(overrides)
     return ProvenanceRecord(**defaults)
 
